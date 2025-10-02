@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFC積木畫說明書查詢下載系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 引入具科技感的 Google 字體 */
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700&display=swap');
+        
+        :root {
+            --bg-dark: #0a0a1a;
+            --primary-glow: #00ffff;
+            --secondary-glow: #9400d3;
+            --text-light: #e0e0e0;
+            --warning-glow: #ffe564;
+        }
+
+        body {
+            font-family: 'Exo 2', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        /* 動態背景動畫 */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: url('https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover;
+            background-position: center;
+            animation: pulse-bg 20s ease-in-out infinite;
+        }
+
+        @keyframes pulse-bg {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* 玻璃擬態效果與光暈邊框 */
+        #main-container {
+            background: rgba(26, 26, 46, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.1), 0 0 50px rgba(148, 0, 211, 0.1);
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 輸入框設計 */
+        .tech-input {
+            background: rgba(10, 10, 26, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+        .tech-input:focus {
+            background: rgba(10, 10, 26, 0.9);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            border-color: var(--primary-glow);
+        }
+
+        /* 按鈕設計 */
+        .tech-button {
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), 0 0 20px rgba(148, 0, 211, 0.2);
+            transition: all 0.3s ease;
+        }
+        .tech-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), 0 0 35px rgba(148, 0, 211, 0.3);
+        }
+        
+        .secondary-button {
+            background-color: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary-glow);
+            color: var(--primary-glow);
+        }
+        .secondary-button:hover {
+            background-color: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        /* 頁簽樣式 */
+        .tab-button {
+            background-color: transparent;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            color: rgba(224, 224, 224, 0.7);
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            color: white;
+            background-color: rgba(0, 255, 255, 0.1);
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* PDF/影片 預覽框 */
+        .preview-iframe {
+            width: 100%;
+            height: 65vh; /* 調整高度以容納頁簽 */
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 0.5rem;
+        }
+        
+        /* 讀取動畫 */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--primary-glow);
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        .loader::after {
+            content: '';  
+            box-sizing: border-box;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid;
+            border-color: var(--secondary-glow) transparent;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 醒目提示框樣式 */
+        .warning-box {
+            background-color: rgba(255, 229, 100, 0.1);
+            border: 1px solid var(--warning-glow);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: pulse-warning 2.5s infinite;
+        }
+
+        @keyframes pulse-warning {
+            0% { box-shadow: 0 0 15px rgba(255, 229, 100, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(255, 229, 100, 0.4); }
+            100% { box-shadow: 0 0 15px rgba(255, 229, 100, 0.2); }
+        }
+
+    </style>
+</head>
+<body class="grid place-items-center min-h-screen p-4">
+    <div class="background-animation"></div>
+
+    <div id="main-container" class="w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-8 space-y-6 transition-all duration-500 my-8">
+        
+        <div id="title-section" class="text-center">
+            <img src="https://ppt.cc/f5TqJx@.png" alt="LFC Logo" class="mx-auto h-24 w-auto mb-4 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+            <h1 class="text-3xl font-bold text-white drop-shadow-[0_0_5px_var(--primary-glow)]">LFC積木畫說明書查詢系統</h1>
+            <p class="text-gray-300 mt-2">請輸入您下單的收件人姓名與手機號碼</p>
+        </div>
+
+        <div id="login-form" class="space-y-4">
+            <div>
+                <label for="name" class="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m4-2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5M9 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 9 8m1 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5"/><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM1 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H8.96c.026-.163.04-.33.04-.5C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 1 1 12z"/></svg>
+                    姓名
+                </label>
+                <input type="text" id="name" name="name" placeholder="請輸入姓名"
+                       class="tech-input mt-1 block w-full px-4 py-3 rounded-lg shadow-sm focus:outline-none transition">
+            </div>
+            <div>
+                <label for="phone" class="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg>
+                    手機號碼
+                </label>
+                <input type="tel" id="phone" name="phone" placeholder="請輸入手機號碼"
+                       class="tech-input mt-1 block w-full px-4 py-3 rounded-lg shadow-sm focus:outline-none transition">
+            </div>
+            <button id="search-btn" class="tech-button w-full font-bold py-3 px-4 rounded-lg shadow-lg">
+                查詢
+            </button>
+        </div>
+
+        <div id="result" class="text-center pt-4"></div>
+
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwk08u6SJJcsNtvIpjHmHpPkwKFiYjq_4FJLAWL6oXFiTDUTA7VjKnH3yicGly2aw3f/exec';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameInput = document.getElementById('name');
+            const phoneInput = document.getElementById('phone');
+            const searchBtn = document.getElementById('search-btn');
+            const resultDiv = document.getElementById('result');
+            const loginForm = document.getElementById('login-form');
+            const titleSection = document.getElementById('title-section');
+            const mainContainer = document.getElementById('main-container');
+
+            function getGoogleDriveFileId(url) {
+                if (!url) return null;
+                let match = url.match(/d\/(.*?)(?:\/view|\?|$)/);
+                if (match && match[1]) return match[1];
+                match = url.match(/id=([^&]+)/);
+                if (match && match[1]) return match[1];
+                return null;
+            }
+
+            function resetToSearch() {
+                mainContainer.classList.remove('max-w-4xl');
+                mainContainer.classList.add('max-w-md');
+                loginForm.style.display = 'block';
+                titleSection.style.display = 'block';
+                resultDiv.innerHTML = '';
+                nameInput.value = '';
+                phoneInput.value = '';
+            }
+
+            function setupTabs() {
+                const tabButtons = document.querySelectorAll('.tab-button');
+                const tabContents = document.querySelectorAll('.tab-content');
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const target = button.dataset.target;
+                        
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        tabContents.forEach(content => {
+                            if (content.id === target) {
+                                content.classList.add('active');
+                            } else {
+                                content.classList.remove('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+            searchBtn.addEventListener('click', async () => {
+                const name = nameInput.value.trim();
+                const phone = phoneInput.value.trim();
+
+                if (!name || !phone) {
+                    resultDiv.innerHTML = `<p class="text-red-400 font-semibold">請務必填寫姓名和手機號碼！</p>`;
+                    return;
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="flex justify-center items-center flex-col gap-4">
+                        <div class="loader"></div>
+                        <p class="text-gray-300">驗證身份中...</p>
+                    </div>`;
+                
+                const requestUrl = `${SCRIPT_URL}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+
+                try {
+                    const response = await fetch(requestUrl);
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        const fileId1 = getGoogleDriveFileId(data.fileUrl);
+                        const fileId2 = '1Oe4gyfuH852CJW76j0SpsoaL0wOfd0qM'; // 邊框組裝說明書
+                        const fileId3 = '1v4AbpqD2z0hKKrJt3ePJyO5EMgdHh4Dm'; // 教學影片
+
+                        if (fileId1) {
+                            const embedUrl1 = `https://drive.google.com/file/d/${fileId1}/preview`;
+                            const downloadUrl1 = `https://drive.google.com/uc?export=download&id=${fileId1}`;
+                            const embedUrl2 = `https://drive.google.com/file/d/${fileId2}/preview`;
+                            const downloadUrl2 = `https://drive.google.com/uc?export=download&id=${fileId2}`;
+                            
+                            loginForm.style.display = 'none';
+                            titleSection.style.display = 'none';
+                            mainContainer.classList.remove('max-w-md');
+                            mainContainer.classList.add('max-w-4xl');
+                            
+                            resultDiv.innerHTML = `
+                                <!-- 醒目提示文字 -->
+                                <div class="warning-box text-left">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="flex-shrink-0 text-yellow-300" viewBox="0 0 16 16">
+                                      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-bold text-white">請盡快下載積木畫說明書</p>
+                                        <p class="text-sm text-gray-300">（雲端保存半年）</p>
+                                    </div>
+                                </div>
+
+                                <!-- 頁簽按鈕 -->
+                                <div class="flex border-b border-cyan-500/20 mb-4">
+                                    <button class="tab-button active flex-1 py-2 px-4 text-sm font-bold" data-target="tab1">積木畫說明書</button>
+                                    <button class="tab-button flex-1 py-2 px-4 text-sm font-bold" data-target="tab2">邊框組裝說明書</button>
+                                    <button class="tab-button flex-1 py-2 px-4 text-sm font-bold" data-target="tab3">教學影片</button>
+                                </div>
+
+                                <!-- 頁簽內容 -->
+                                <div id="tab1" class="tab-content active">
+                                    <iframe class="preview-iframe" src="${embedUrl1}"></iframe>
+                                    <div class="mt-6 flex justify-center items-center">
+                                        <a href="${downloadUrl1}" target="_blank" class="tech-button w-full sm:w-auto font-bold py-2 px-6 rounded-lg text-center">下載此說明書</a>
+                                    </div>
+                                </div>
+                                <div id="tab2" class="tab-content">
+                                    <iframe class="preview-iframe" src="${embedUrl2}"></iframe>
+                                     <div class="mt-6 flex justify-center items-center">
+                                        <a href="${downloadUrl2}" target="_blank" class="tech-button w-full sm:w-auto font-bold py-2 px-6 rounded-lg text-center">下載此說明書</a>
+                                    </div>
+                                </div>
+                                <div id="tab3" class="tab-content">
+                                    <div id="video-placeholder" class="preview-iframe relative grid place-items-center bg-black/30 cursor-pointer group rounded-lg overflow-hidden">
+                                        <div class="text-center p-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-play-circle-fill text-white/70 group-hover:text-white/90 group-hover:scale-110 transition-all duration-300 mx-auto" viewBox="0 0 16 16">
+                                              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/>
+                                            </svg>
+                                            <p class="mt-4 text-lg font-semibold">點擊播放教學影片</p>
+                                            <p class="text-sm text-gray-400">(將在新分頁中開啟)</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 text-center">
+                                    <button id="back-to-search-btn" class="secondary-button font-bold py-2 px-6 rounded-lg transition">返回查詢</button>
+                                </div>
+                            `;
+                            setupTabs();
+
+                            document.getElementById('video-placeholder').addEventListener('click', () => {
+                                window.open(`https://drive.google.com/file/d/${fileId3}/view?usp=sharing`, '_blank');
+                            });
+
+                            document.getElementById('back-to-search-btn').addEventListener('click', resetToSearch);
+
+                        } else {
+                            resultDiv.innerHTML = `<p class="text-red-400 font-semibold">找不到對應的檔案連結。</p>`;
+                        }
+                    } else {
+                        resultDiv.innerHTML = `<p class="text-orange-400 font-semibold">${data.message || '查詢失敗，請檢查姓名和手機號碼是否正確。'}</p>`;
+                    }
+                } catch (error) {
+                    console.error('查詢失敗:', error);
+                    resultDiv.innerHTML = `<p class="text-red-400 font-semibold">查詢失敗，請檢查網路連線。</p>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
