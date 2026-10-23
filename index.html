@@ -1,217 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LFC積木畫說明書查詢下載系統</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* 引入具科技感的 Google 字體 */
-        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700&display=swap');
-        
-        :root {
-            --bg-dark: #0a0a1a;
-            --primary-glow: #00ffff;
-            --secondary-glow: #9400d3;
-            --text-light: #e0e0e0;
-            --warning-glow: #ffe564;
-        }
-
-        body {
-            font-family: 'Exo 2', 'Noto Sans TC', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-        }
-
-        /* 動態背景動畫 */
-        .background-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-image: url('https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-size: cover;
-            background-position: center;
-            animation: pulse-bg 20s ease-in-out infinite;
-        }
-
-        @keyframes pulse-bg {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        /* 玻璃擬態效果與光暈邊框 */
-        #main-container {
-            background: rgba(26, 26, 46, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.1), 0 0 50px rgba(148, 0, 211, 0.1);
-            animation: fadeIn 1s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 輸入框設計 */
-        .tech-input {
-            background: rgba(10, 10, 26, 0.7);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            color: var(--text-light);
-            transition: all 0.3s ease;
-        }
-        .tech-input:focus {
-            background: rgba(10, 10, 26, 0.9);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-            border-color: var(--primary-glow);
-        }
-
-        /* 按鈕設計 */
-        .tech-button {
-            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
-            color: #ffffff;
-            border: none;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), 0 0 20px rgba(148, 0, 211, 0.2);
-            transition: all 0.3s ease;
-        }
-        .tech-button:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), 0 0 35px rgba(148, 0, 211, 0.3);
-        }
-        
-        .secondary-button {
-            background-color: rgba(0, 255, 255, 0.1);
-            border: 1px solid var(--primary-glow);
-            color: var(--primary-glow);
-        }
-        .secondary-button:hover {
-            background-color: rgba(0, 255, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-        }
-
-        /* 頁簽樣式 */
-        .tab-button {
-            background-color: transparent;
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            color: rgba(224, 224, 224, 0.7);
-            transition: all 0.3s ease;
-        }
-        .tab-button.active {
-            color: white;
-            background-color: rgba(0, 255, 255, 0.1);
-            border-color: var(--primary-glow);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        /* PDF/影片 預覽框 */
-        .preview-iframe {
-            width: 100%;
-            height: 65vh; /* 調整高度以容納頁簽 */
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 0.5rem;
-        }
-        
-        /* 讀取動畫 */
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 3px solid var(--primary-glow);
-            border-radius: 50%;
-            display: inline-block;
-            position: relative;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-        .loader::after {
-            content: '';  
-            box-sizing: border-box;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: 3px solid;
-            border-color: var(--secondary-glow) transparent;
-        }
-
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* 醒目提示框樣式 */
-        .warning-box {
-            background-color: rgba(255, 229, 100, 0.1);
-            border: 1px solid var(--warning-glow);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            animation: pulse-warning 2.5s infinite;
-        }
-
-        @keyframes pulse-warning {
-            0% { box-shadow: 0 0 15px rgba(255, 229, 100, 0.2); }
-            50% { box-shadow: 0 0 25px rgba(255, 229, 100, 0.4); }
-            100% { box-shadow: 0 0 15px rgba(255, 229, 100, 0.2); }
-        }
-
-    </style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LFC 拼裝說明書｜查詢與閱讀</title>
+  <meta name="description" content="輸入收件人姓名與手機號碼，查詢 LFC 積木畫拼裝說明書、邊框組裝說明與教學影片。">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="customer-base.css?v=b-manual-1"><link rel="stylesheet" href="customer-manual.css?v=b-manual-1">
+  <script defer src="customer-manual.js?v=b-manual-1"></script>
 </head>
-<body class="grid place-items-center min-h-screen p-4">
-    <div class="background-animation"></div>
-
-    <div id="main-container" class="w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-8 space-y-6 transition-all duration-500 my-8">
-        
-        <div id="title-section" class="text-center">
-            <img src="https://ppt.cc/f5TqJx@.png" alt="LFC Logo" class="mx-auto h-24 w-auto mb-4 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-            <h1 class="text-3xl font-bold text-white drop-shadow-[0_0_5px_var(--primary-glow)]">LFC積木畫說明書查詢系統</h1>
-            <p class="text-gray-300 mt-2">請輸入您下單的收件人姓名與手機號碼</p>
-        </div>
-
-        <div id="login-form" class="space-y-4">
-            <div>
-                <label for="name" class="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m4-2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5M9 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 9 8m1 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5"/><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM1 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H8.96c.026-.163.04-.33.04-.5C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 1 1 12z"/></svg>
-                    姓名
-                </label>
-                <input type="text" id="name" name="name" placeholder="請輸入姓名"
-                       class="tech-input mt-1 block w-full px-4 py-3 rounded-lg shadow-sm focus:outline-none transition">
-            </div>
-            <div>
-                <label for="phone" class="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg>
-                    手機號碼
-                </label>
-                <input type="tel" id="phone" name="phone" placeholder="請輸入手機號碼"
-                       class="tech-input mt-1 block w-full px-4 py-3 rounded-lg shadow-sm focus:outline-none transition">
-            </div>
-            <button id="search-btn" class="tech-button w-full font-bold py-3 px-4 rounded-lg shadow-lg">
-                查詢
-            </button>
-        </div>
-
-        <div id="result" class="text-center pt-4"></div>
-
-    </div>
-
-    <script>
+<body>
+  <a class="skip-link" href="#name">跳至說明書查詢</a>
+  <header class="site-header"><a class="brand" href="./" aria-label="LFC 說明書查詢首頁"><img src="preview-logo.png" alt="LFC" width="48" height="48"><span>林爸角落<small>LFC BRICK ART</small></span></a><nav aria-label="客戶服務"><a href="https://ricksgemini0857.github.io/lfc-block-painting-effect/">效果圖查詢</a><a href="./" aria-current="page">說明書查詢</a></nav></header>
+  <main id="main-container" class="manual-main max-w-md" data-view="lookup">
+    <section id="title-section" class="lookup-story" aria-labelledby="manual-lookup-title"><p class="eyebrow">LFC / YOUR ASSEMBLY GUIDE</p><h1 id="manual-lookup-title"><span class="title-line">找到你的</span><span class="title-line"><span>拼裝說明書。</span></span></h1><p class="story-intro">輸入收件人姓名與手機號碼，<br>開啟圖紙、組裝說明與教學。</p><figure class="guide-preview"><div class="guide-paper"><iframe src="https://drive.google.com/file/d/1Oe4gyfuH852CJW76j0SpsoaL0wOfd0qM/preview" title="邊框組裝說明書預覽" loading="lazy"></iframe></div><figcaption><span>先熟悉邊框，準備開始拼裝。</span><a href="?guide=frame">展開教學文件 ↗</a></figcaption></figure></section>
+    <form id="login-form" class="lookup-panel" aria-labelledby="manual-form-title"><p class="panel-index">說明書查詢 <span>↘</span></p><h2 id="manual-form-title">準備開始拼裝</h2><p class="form-help">請輸入下單時的收件人姓名與手機號碼。</p><div class="field-group"><label for="name">姓名</label><input type="text" id="name" name="name" autocomplete="name" aria-required="true" placeholder="請輸入姓名"></div><div class="field-group"><label for="phone">手機號碼</label><input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" aria-required="true" placeholder="請輸入手機號碼"></div><button type="button" id="search-btn" class="search-button"><span class="search-label">查詢</span><span aria-hidden="true">↗</span></button><div class="panel-links"><a href="?guide=frame">先看邊框組裝與教學 ↗</a><a href="https://ricksgemini0857.github.io/lfc-block-painting-effect/">我要查詢積木畫效果圖 ↗</a></div></form>
+    <div id="manual-reader-heading" class="hidden"><p class="eyebrow">LFC / READING DESK</p><h1 tabindex="-1">拼裝說明書與教學</h1></div>
+    <div id="result" role="region" aria-label="查詢結果"></div><p id="manual-status" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+  <footer class="site-footer"><span>林爸角落 LFC · 拼裝說明書與教學</span><a href="https://ricksgemini0857.github.io/lfc-block-painting-effect/">積木畫效果圖查詢 ↗</a></footer>
+  <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwk08u6SJJcsNtvIpjHmHpPkwKFiYjq_4FJLAWL6oXFiTDUTA7VjKnH3yicGly2aw3f/exec';
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -371,4 +179,3 @@
     </script>
 </body>
 </html>
-
