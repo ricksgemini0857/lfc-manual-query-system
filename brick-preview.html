@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LFC 拼裝說明書｜查詢與閱讀</title>
+  <meta name="description" content="輸入收件人姓名與手機號碼，查詢 LFC 積木畫拼裝說明書、邊框組裝說明與教學影片。">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="customer-base.css?v=b-manual-1"><link rel="stylesheet" href="customer-manual.css?v=b-manual-1">
+  <script defer src="customer-manual.js?v=b-manual-1"></script>
+<link rel="stylesheet" href="brick-theme.css?v=brick-1">
+</head>
+<body class="brick-design">
+  <a class="skip-link" href="#name">跳至說明書查詢</a>
+  <header class="site-header"><a class="brand" href="brick-preview.html" aria-label="LFC 說明書查詢首頁"><img src="preview-logo.png" alt="LFC" width="48" height="48"><span>林爸角落<small>LFC BRICK ART</small></span></a><nav aria-label="客戶服務"><a href="https://ricksgemini0857.github.io/lfc-block-painting-effect/brick-preview.html">效果圖查詢</a><a href="brick-preview.html" aria-current="page">說明書查詢</a></nav></header>
+  <main id="main-container" class="manual-main max-w-md" data-view="lookup">
+    <section id="title-section" class="lookup-story" aria-labelledby="manual-lookup-title"><p class="eyebrow">LFC / YOUR ASSEMBLY GUIDE</p><h1 id="manual-lookup-title"><span class="title-line">找到你的</span><span class="title-line"><span>拼裝說明書。</span></span></h1><p class="story-intro">輸入收件人姓名與手機號碼，<br>開啟圖紙、組裝說明與教學。</p><figure class="guide-preview"><div class="guide-paper"><iframe src="https://drive.google.com/file/d/1Oe4gyfuH852CJW76j0SpsoaL0wOfd0qM/preview" title="邊框組裝說明書預覽" loading="lazy"></iframe></div><figcaption><span>先熟悉邊框，準備開始拼裝。</span><a href="?guide=frame">展開教學文件 ↗</a></figcaption></figure></section>
+    <form id="login-form" class="lookup-panel" aria-labelledby="manual-form-title"><div class="stud-rail" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div><p class="panel-index">說明書查詢 <span>↘</span></p><h2 id="manual-form-title">準備開始拼裝</h2><p class="form-help">請輸入下單時的收件人姓名與手機號碼。</p><div class="field-group"><label for="name">姓名</label><input type="text" id="name" name="name" autocomplete="name" aria-required="true" placeholder="請輸入姓名"></div><div class="field-group"><label for="phone">手機號碼</label><input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" aria-required="true" placeholder="請輸入手機號碼"></div><button type="button" id="search-btn" class="search-button"><span class="search-label">查詢</span><span aria-hidden="true">↗</span></button><div class="panel-links"><a href="?guide=frame">先看邊框組裝與教學 ↗</a><a href="https://ricksgemini0857.github.io/lfc-block-painting-effect/brick-preview.html">我要查詢積木畫效果圖 ↗</a></div></form>
+    <div id="manual-reader-heading" class="hidden"><p class="eyebrow">LFC / READING DESK</p><h1 tabindex="-1">拼裝說明書與教學</h1></div>
+    <div id="result" role="region" aria-label="查詢結果"></div><p id="manual-status" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+  <footer class="site-footer"><span>林爸角落 LFC · 拼裝說明書與教學</span><a href="https://ricksgemini0857.github.io/lfc-block-painting-effect/brick-preview.html">積木畫效果圖查詢 ↗</a></footer>
+  <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwk08u6SJJcsNtvIpjHmHpPkwKFiYjq_4FJLAWL6oXFiTDUTA7VjKnH3yicGly2aw3f/exec';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameInput = document.getElementById('name');
+            const phoneInput = document.getElementById('phone');
+            const searchBtn = document.getElementById('search-btn');
+            const resultDiv = document.getElementById('result');
+            const loginForm = document.getElementById('login-form');
+            const titleSection = document.getElementById('title-section');
+            const mainContainer = document.getElementById('main-container');
+
+            function getGoogleDriveFileId(url) {
+                if (!url) return null;
+                let match = url.match(/d\/(.*?)(?:\/view|\?|$)/);
+                if (match && match[1]) return match[1];
+                match = url.match(/id=([^&]+)/);
+                if (match && match[1]) return match[1];
+                return null;
+            }
+
+            function resetToSearch() {
+                mainContainer.classList.remove('max-w-4xl');
+                mainContainer.classList.add('max-w-md');
+                loginForm.style.display = 'block';
+                titleSection.style.display = 'block';
+                resultDiv.innerHTML = '';
+                nameInput.value = '';
+                phoneInput.value = '';
+            }
+
+            function setupTabs() {
+                const tabButtons = document.querySelectorAll('.tab-button');
+                const tabContents = document.querySelectorAll('.tab-content');
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const target = button.dataset.target;
+                        
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        tabContents.forEach(content => {
+                            if (content.id === target) {
+                                content.classList.add('active');
+                            } else {
+                                content.classList.remove('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+            searchBtn.addEventListener('click', async () => {
+                const name = nameInput.value.trim();
+                const phone = phoneInput.value.trim();
+
+                if (!name || !phone) {
+                    resultDiv.innerHTML = `<p class="text-red-400 font-semibold">請務必填寫姓名和手機號碼！</p>`;
+                    return;
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="flex justify-center items-center flex-col gap-4">
+                        <div class="loader"></div>
+                        <p class="text-gray-300">驗證身份中...</p>
+                    </div>`;
+                
+                const requestUrl = `${SCRIPT_URL}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+
+                try {
+                    const response = await fetch(requestUrl);
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        const fileId1 = getGoogleDriveFileId(data.fileUrl);
+                        const fileId2 = '1Oe4gyfuH852CJW76j0SpsoaL0wOfd0qM'; // 邊框組裝說明書
+                        const fileId3 = '1v4AbpqD2z0hKKrJt3ePJyO5EMgdHh4Dm'; // 教學影片
+
+                        if (fileId1) {
+                            const embedUrl1 = `https://drive.google.com/file/d/${fileId1}/preview`;
+                            const downloadUrl1 = `https://drive.google.com/uc?export=download&id=${fileId1}`;
+                            const embedUrl2 = `https://drive.google.com/file/d/${fileId2}/preview`;
+                            const downloadUrl2 = `https://drive.google.com/uc?export=download&id=${fileId2}`;
+                            
+                            loginForm.style.display = 'none';
+                            titleSection.style.display = 'none';
+                            mainContainer.classList.remove('max-w-md');
+                            mainContainer.classList.add('max-w-4xl');
+                            
+                            resultDiv.innerHTML = `
+                                <!-- 醒目提示文字 -->
+                                <div class="warning-box text-left">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="flex-shrink-0 text-yellow-300" viewBox="0 0 16 16">
+                                      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-bold text-white">請盡快下載積木畫說明書</p>
+                                        <p class="text-sm text-gray-300">（雲端保存半年）</p>
+                                    </div>
+                                </div>
+
+                                <!-- 頁簽按鈕 -->
+                                <div class="flex border-b border-cyan-500/20 mb-4">
+                                    <button class="tab-button active flex-1 py-2 px-4 text-sm font-bold" data-target="tab1">積木畫說明書</button>
+                                    <button class="tab-button flex-1 py-2 px-4 text-sm font-bold" data-target="tab2">邊框組裝說明書</button>
+                                    <button class="tab-button flex-1 py-2 px-4 text-sm font-bold" data-target="tab3">教學影片</button>
+                                </div>
+
+                                <!-- 頁簽內容 -->
+                                <div id="tab1" class="tab-content active">
+                                    <iframe class="preview-iframe" src="${embedUrl1}"></iframe>
+                                    <div class="mt-6 flex justify-center items-center">
+                                        <a href="${downloadUrl1}" target="_blank" class="tech-button w-full sm:w-auto font-bold py-2 px-6 rounded-lg text-center">下載此說明書</a>
+                                    </div>
+                                </div>
+                                <div id="tab2" class="tab-content">
+                                    <iframe class="preview-iframe" src="${embedUrl2}"></iframe>
+                                     <div class="mt-6 flex justify-center items-center">
+                                        <a href="${downloadUrl2}" target="_blank" class="tech-button w-full sm:w-auto font-bold py-2 px-6 rounded-lg text-center">下載此說明書</a>
+                                    </div>
+                                </div>
+                                <div id="tab3" class="tab-content">
+                                    <div id="video-placeholder" class="preview-iframe relative grid place-items-center bg-black/30 cursor-pointer group rounded-lg overflow-hidden">
+                                        <div class="text-center p-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-play-circle-fill text-white/70 group-hover:text-white/90 group-hover:scale-110 transition-all duration-300 mx-auto" viewBox="0 0 16 16">
+                                              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/>
+                                            </svg>
+                                            <p class="mt-4 text-lg font-semibold">點擊播放教學影片</p>
+                                            <p class="text-sm text-gray-400">(將在新分頁中開啟)</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 text-center">
+                                    <button id="back-to-search-btn" class="secondary-button font-bold py-2 px-6 rounded-lg transition">返回查詢</button>
+                                </div>
+                            `;
+                            setupTabs();
+
+                            document.getElementById('video-placeholder').addEventListener('click', () => {
+                                window.open(`https://drive.google.com/file/d/${fileId3}/view?usp=sharing`, '_blank');
+                            });
+
+                            document.getElementById('back-to-search-btn').addEventListener('click', resetToSearch);
+
+                        } else {
+                            resultDiv.innerHTML = `<p class="text-red-400 font-semibold">找不到對應的檔案連結。</p>`;
+                        }
+                    } else {
+                        resultDiv.innerHTML = `<p class="text-orange-400 font-semibold">${data.message || '查詢失敗，請檢查姓名和手機號碼是否正確。'}</p>`;
+                    }
+                } catch (error) {
+                    console.error('查詢失敗:', error);
+                    resultDiv.innerHTML = `<p class="text-red-400 font-semibold">查詢失敗，請檢查網路連線。</p>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
